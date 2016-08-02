@@ -1,0 +1,157 @@
+<html>
+<head>
+<style>
+table { border: 1px solid #333; }
+tr:nth-child(even) {background: #CCC}
+tr:nth-child(odd) {background: #FFF}
+</style>
+<script language="javascript">
+var t
+
+function fixnan(i) {
+  if(isNaN(i)) {
+    return 0
+  } else {
+    return i
+  }
+}
+
+function formatDecimal(num, numPlaces) {
+	var snum = new String(parseFloat(num))
+	var i = z = 0 
+	var sout = ch = "" 
+	while(i<snum.length && ch != '.' ) {
+		ch = snum.charAt(i++)
+		sout+=ch
+	}
+	while(i<snum.length && z++<numPlaces) {
+		ch = snum.charAt(i++)
+		sout+=ch
+	}
+	if(snum.indexOf('.')==-1)sout+='.'
+	while(z++<numPlaces)sout+='0'
+	return sout
+}
+
+// hard-coded to pad to 2 digits
+function pad(num) {
+    var s = num+""
+    while (s.length < 2) s = "0" + s
+    return s
+}
+
+function calculateTimes(){
+	var dist=document.showtimes.distance.value
+	var multi=document.showtimes.multiplier.value
+  var out = document.getElementById('results')
+  var myTable = document.createElement('table');
+  var myTr = document.createElement('tr');
+  var col1 = document.createElement('th');
+  var col2 = document.createElement('th');
+  var col3 = document.createElement('th');
+  myTr.appendChild(col1);
+  myTr.appendChild(col2);
+  myTr.appendChild(col3);
+  col1.innerHTML = 'Speed';
+  col2.innerHTML = 'Bogie';
+  col3.innerHTML = 'Target';
+  myTable.appendChild(myTr);
+  var speeds = [70,65,60,55,50,45,40,35,30,25,20,15,10,5];
+  var speedCount = speeds.length;
+  for (var i = 0; i < speedCount; i++) {
+    var times = calculateTime(dist, speeds[i], multi);
+    myTr = document.createElement('tr');
+    col1 = document.createElement('td');
+    col2 = document.createElement('td');
+    col3 = document.createElement('td');
+    myTr.appendChild(col1);
+    myTr.appendChild(col2);
+    myTr.appendChild(col3);
+    col1.innerHTML= speeds[i];
+    col2.innerHTML=times.bogie;
+    col3.innerHTML=times.target;
+    myTable.appendChild(myTr);
+  }
+  out.replaceChild(myTable, out.childNodes[0]);
+}
+
+function calculateTime(nDist, nSpeed, nMulti){
+  var nDistMetres, SpeedMetersPerSec, SecondsRequired;
+  var hours, minutes , secs, remainder;
+  var bogie, target;	
+  
+  // Convert all miles & mph to meters & mps
+  nDistMetres = nDist * 1609.344;
+  SpeedMetersPerSec = nSpeed / 2.2369363;
+  nDistMetres=fixnan(nDistMetres)
+	SpeedMetersPerSec=fixnan( SpeedMetersPerSec)
+
+  // return 0 if no data
+	if( nDistMetres == 0 || SpeedMetersPerSec == 0){
+	return( {
+    bogie : "00:00:00.00",
+    target: "00:00:00.00"
+    } )
+    return ;
+	}
+
+  // and get our times - first bogie
+	SecondsRequired = nDistMetres / SpeedMetersPerSec;
+	SecondsRequired = parseFloat(formatDecimal(SecondsRequired,8))
+	hours = fixnan(parseInt(SecondsRequired / 3600))
+
+  // avoids embarassing problem where 20mph for 20 miles doesn't come
+  // to exactly 1 hr because spurious extra numbers after decimal point
+  // can add minutes!!!
+	remainder = fixnan(parseFloat(formatDecimal(SecondsRequired - (hours * 3600.0),4)))
+	minutes = fixnan(parseInt(remainder / 60.0))
+	secs = remainder - (minutes * 60.0)
+	if( secs<= 0.0001 ) secs=0
+	secs=fixnan(parseFloat(secs))
+	bogie = parseInt(hours) + ":" + pad(parseInt(minutes)) + ":" + formatDecimal(secs, 1)
+  mdinutes = pad(minutes)
+	
+  // and then target time 
+	SecondsRequired = (nDistMetres / SpeedMetersPerSec) * fixnan(nMulti)
+	SecondsRequired = parseFloat(formatDecimal(SecondsRequired,8))
+	hours = fixnan(parseInt(SecondsRequired / 3600))
+
+  // avoids embarassing problem where 20mph for 20 miles doesn't come
+  // to exactly 1 hr because spurious extra numbers after decimal point
+  // can add minutes!!!
+	remainder = fixnan(parseFloat(formatDecimal(SecondsRequired - (hours * 3600.0),4)))
+	minutes = fixnan(parseInt(remainder / 60.0))
+	secs = remainder - (minutes * 60.0)
+	if( secs<= 0.0001 ) secs=0
+	secs=fixnan(parseFloat(secs))
+	target = parseInt(hours) + ":" + pad(parseInt(minutes)) + ":" + formatDecimal(secs, 1)
+
+	return( {
+    bogie : bogie,
+    target: target
+    } )
+}
+</script>
+
+</head>
+<body>
+<h1>Quick'n'Dirty Stage Times</h1>
+<dl>
+<dt>Rallies on unsealed surfaces: max average speed = 70mph</dt>
+<dd>Target Time probably set at 30mph</dd>
+<dt>Safari-plus &amp; Hill Rally: max average speed = 50mph</dt>
+<dt>Comp Safari: max average speed = 30mph</dt>
+<dd>Target Time probably 3 times Bogie</dd>
+</dl>
+<p>Change the distance or the multiplier, and the times will change automatically.</p>
+<form name="showtimes">
+<b>Distance (miles): </b>
+<input TYPE="text" NAME="distance" VALUE="" SIZE=5 onChange="calculateTimes()" onkeyup="calculateTimes()" onFocus="this.select();this.focus();" /> 
+<b>Target Time Miltiplier: </b>
+<input TYPE="text" NAME="multiplier" VALUE="3" SIZE=3 onChange="calculateTimes()" onkeyup="calculateTimes()" onFocus="this.select();this.focus();" /> <br />
+</form>
+<div id='results'><span /></div>
+<p>(this page is completely javascript, and completely client-side)</p>
+<p>(this page is on gitlab: )</p>
+</body>
+</html>
