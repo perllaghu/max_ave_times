@@ -56,7 +56,7 @@ function calculateTimes(){
   col2.innerHTML = 'Bogie';
   col3.innerHTML = 'Target';
   myTable.appendChild(myTr);
-  var speeds = [70,65,60,55,50,45,40,35,30,25,20,15,10,5];
+  var speeds = [75,70,65,60,55,50,45,40,35,30,25,20,15,10,5];
   var speedCount = speeds.length;
   for (var i = 0; i < speedCount; i++) {
     var times = calculateTime(dist, speeds[i], multi);
@@ -137,11 +137,14 @@ function calculateTime(nDist, nSpeed, nMulti){
 <body>
 <h1>Quick'n'Dirty Stage Times</h1>
 <dl>
-<dt>Rallies on unsealed surfaces: max average speed = 70mph</dt>
-<dd>Target Time probably set at 30mph</dd>
-<dt>Safari-plus &amp; Hill Rally: max average speed = 50mph</dt>
-<dt>Comp Safari: max average speed = 30mph</dt>
-<dd>Target Time probably 3 times Bogie</dd>
+<dt>Rallies
+<dd>On wholey sealed surfaces: max average speed = 75mph (R 28.2.1)</dd>
+<dd>On partially/wholey unsealed surfaces: max average speed = 70mph (R 28.2.2)</dd>
+<dd>(Target Time probably set at 30mph)</dd>
+<dt>Cross Country (P 11.3.2)</dt>
+<dd>Safari-plus &amp; Hill Rally: max average speed = 50mph</dd>
+<dd>Comp Safari: max average speed = 30mph</dd>
+<dd>(Target Time probably 3 times Bogie)</dd>
 </dl>
 <p>Change the distance or the multiplier, and the times will change automatically.</p>
 <form name="showtimes">
@@ -152,7 +155,7 @@ function calculateTime(nDist, nSpeed, nMulti){
 </form>
 <div id='results'><span /></div>
 <p>(this page is completely javascript, and completely client-side)</p>
-<p>(this page is on gitlab: https://github.com/perllaghu/max_ave_times - and is open to improvemnt)</p>
+<p>(this page is on gitlab: <a href='https://github.com/perllaghu/max_ave_times' title='GitHUB pager' target='_blank'>https://github.com/perllaghu/max_ave_times</a> - and is open to improvemnt)</p>
 <p>(Anyone fancy making an android app of this?)</p>
 </body>
 </html>
